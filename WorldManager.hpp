@@ -29,9 +29,9 @@ public:
 };
 
 class Chunk{
+public:
     Chunk* previous_ = nullptr;
     Chunk* next_ = nullptr;
-public:
     static const int CHUNK_SIZE = 16;
     chunk_position position;
     int generated:2 = 0;
@@ -64,9 +64,52 @@ private:
     Chunk* selected_ = &origin_chunk;
     int direction:3 = 0;//1=forward 2=forwardPass -1=back -2=backPass
 public:
-    Chunk& getChunkAt(long int pos_x, long int pos_y){//optimize later cause its propably dogshit
+    void resetSelected(){
+        selected_ =&origin_chunk;
+    }
+    bool selectNext(){
+        if(selected_->next_ == nullptr){
+            return false;
+        }
+        selected_ = selected_->next_;
+    }
+    bool selectPrevious(){
+        if(selected_->previous_ == nullptr){
+            return false;
+        }
+        selected_ = selected_->previous_;
+    }
+    bool pushAfter(Chunk& target, long int pos_x, long int pos_y){//returns true if it the created chunk is last in line
+        Chunk* temp_pointer_ = new Chunk(pos_x, pos_y);
+        if(target.next_ == nullptr){
+            target.next_ = temp_pointer_;
+            target.next_->previous_ = &target;
+            return true;
+        }else{
+            temp_pointer_->next_ = target.next_;
+            target.next_->previous_ = temp_pointer_;
+            temp_pointer_->previous_ = &target;
+            target.next_ = temp_pointer_;
+            return false;
+        }
+    }
+    bool pushBefore(Chunk& target, long int pos_x, long int pos_y){//returns true if it the created chunk is first in line
+        Chunk* temp_pointer_ = new Chunk(pos_x, pos_y);
+        if(target.previous_ == nullptr){
+            target.previous_ = temp_pointer_;
+            target.previous_->next_ = &target;
+            return true;
+        }else{
+            temp_pointer_->previous_ = target.previous_;
+            target.previous_->next_ = temp_pointer_;
+            temp_pointer_->next_ = &target;
+            target.previous_ = temp_pointer_;
+            return false;
+        }
+    }
+    Chunk* getChunkAt(long int pos_x, long int pos_y){//optimize later cause its propably dogshit
         if(pos_x == 0, pos_y == 0){
-            return origin_chunk;
+            return &origin_chunk;
         }
         selected_ = &origin_chunk;
         if(selected_->position.y == pos_y){
@@ -75,13 +118,45 @@ public:
             }else{
                 direction = -1;
             }
+        }else if(selected_->position.y > pos_y){
+            direction = 1;
+        }else{
+            direction = -1;
         }
         while(
             selected_->position.x != pos_x &&
             selected_->position.y != pos_y
         ){
-
+            if(direction > 0){
+                if(direction == 2){
+                    pushBefore(*selected_, pos_x, pos_y);
+                    selectPrevious();
+                    continue;
+                }
+                if(!selectNext()){
+                    pushAfter(*selected_, pos_x, pos_y);
+                    selectNext();
+                    continue;
+                }
+                if((selected_->position.y == pos_y && selected_->position.x < pos_x) || selected_->position.y < pos_y){
+                    direction = 2;
+                }
+            }else{
+                if(direction == -2){
+                    pushAfter(*selected_, pos_x, pos_y);
+                    selectNext();
+                    continue;
+                }
+                if(!selectPrevious()){
+                    pushBefore(*selected_, pos_x, pos_y);
+                    selectPrevious();
+                    continue;
+                }
+                if((selected_->position.y == pos_y && selected_->position.x > pos_x) || selected_->position.y > pos_y){
+                    direction = 2;
+                }
+            }
         }
-        return *selected_;
+        return selected_;
     }
 };
