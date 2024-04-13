@@ -32,7 +32,7 @@ class Chunk{
 public:
     Chunk* previous_ = nullptr;
     Chunk* next_ = nullptr;
-    static const int CHUNK_SIZE = 16;
+    static const int CHUNK_SIZE = 32;
     chunk_position position;
     int generated:2 = 0;
     Tile tiles[CHUNK_SIZE][CHUNK_SIZE];
@@ -56,6 +56,12 @@ public:
         generated = true;
         return true;
     }
+    static chunk_position convertToChunkPosition(long int pos_x, long int pos_y){
+        chunk_position returnPosition;
+        returnPosition.x = (pos_x-(pos_x%CHUNK_SIZE))/CHUNK_SIZE;
+        returnPosition.y = (pos_y-(pos_y%CHUNK_SIZE))/CHUNK_SIZE;
+        return returnPosition;
+    }
 };
 
 class World{
@@ -78,6 +84,19 @@ public:
             return false;
         }
         selected_ = selected_->previous_;
+    }
+    void selectFirst(){
+        while(selected_->previous_!=nullptr){
+            selectPrevious();
+        }
+    }
+    void selectLast(){
+        while(selected_->next_!=nullptr){
+            selectNext();
+        }
+    }
+    Chunk* getSelected(){
+        return selected_;
     }
     bool pushAfter(Chunk& target, long int pos_x, long int pos_y){//returns true if it the created chunk is last in line
         Chunk* temp_pointer_ = new Chunk(pos_x, pos_y);
@@ -106,6 +125,9 @@ public:
             target.previous_ = temp_pointer_;
             return false;
         }
+    }
+    Chunk* getChunkAt(sf::Vector2i position_vector){
+        return getChunkAt(position_vector.x, position_vector.y);
     }
     Chunk* getChunkAt(long int pos_x, long int pos_y){//optimize later cause its propably dogshit
         if(pos_x == 0, pos_y == 0){

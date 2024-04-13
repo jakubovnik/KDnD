@@ -9,7 +9,7 @@
 #include <SFML/Graphics.hpp>
 // #include "includes.hpp"
 
-int getRandomNumber(int min, int max) {
+int getRandomNumber(int min, int max) {// copied from chatgpt lol
     // Initialize random number generator with current time as seed
     std::mt19937 mt(static_cast<unsigned int>(time(0)));
     
