@@ -9,15 +9,13 @@
 #include <SFML/Graphics.hpp>
 // #include "includes.hpp"
 
-int getRandomNumber(int min, int max) {// copied from chatgpt lol
-    // Initialize random number generator with current time as seed
-    std::mt19937 mt(static_cast<unsigned int>(time(0)));
-    
-    // Define distribution for integers between min and max (inclusive)
-    std::uniform_int_distribution<int> dist(min, max);
+int getRandomNumber(int min, int max) {
+    // Initialize a random device to seed the random number engine
+    std::random_device rd;
+    std::mt19937 rng(rd());  // Mersenne Twister 19937 random number generator
+    std::uniform_int_distribution<int> distribution(min, max);  // Uniform distribution of integers
 
-    // Generate and return a random number
-    return dist(mt);
+    return distribution(rng);  // Generate and return a random integer
 }
 
 void debug(std::string messsage, int line){

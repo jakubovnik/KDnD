@@ -30,16 +30,19 @@ public:
 
 class Chunk{
 public:
-    Chunk* previous_ = nullptr;
-    Chunk* next_ = nullptr;
+    Chunk* previous_;
+    Chunk* next_;
     static const int CHUNK_SIZE = 64;
     chunk_position position;
-    bool generated = false;
+    bool generated;
     Tile tiles[CHUNK_SIZE][CHUNK_SIZE];
 
     Chunk(int x, int y){
         position.x = x;
         position.y = y;
+        previous_ = nullptr;
+        next_ = nullptr;
+        generated = false;
     }
 
     bool generateRandom(){
@@ -48,14 +51,14 @@ public:
         }
         for(int y = 0; y < CHUNK_SIZE; y++){
             for(int x = 0; x < CHUNK_SIZE; x++){
-                tiles[x][y].setMaterial(getRandomNumber(0,3));// TODO: change this bruh
+                tiles[x][y].setMaterial(getRandomNumber(0,3));// TODO: change this to something random
             }
         }
         generated = true;
         return true;
     }
-    static chunk_position convertToChunkPosition(int pos_x, int pos_y){
-        chunk_position returnPosition;
+    static sf::Vector2i convertToChunkPosition(int pos_x, int pos_y){
+        sf::Vector2i returnPosition;
         returnPosition.x = (pos_x-(pos_x%CHUNK_SIZE))/CHUNK_SIZE;
         returnPosition.y = (pos_y-(pos_y%CHUNK_SIZE))/CHUNK_SIZE;
         return returnPosition;
@@ -64,10 +67,14 @@ public:
 
 class World{
 private:
-    Chunk origin_chunk = Chunk(0,0);
-    Chunk* selected_ = &origin_chunk;
-    int direction = 0;//1=forward 2=forwardPass -1=back -2=backPass
+    Chunk origin_chunk;
+    Chunk* selected_;
+    int direction;//1=forward 2=forwardPass -1=back -2=backPass
 public:
+    World():origin_chunk(0,0){
+        selected_ = &origin_chunk;
+        direction = 0;
+    }
     void resetSelected(){
         selected_ = &origin_chunk;
     }
@@ -98,12 +105,16 @@ public:
     Chunk* getSelected(){
         return selected_;
     }
+    void setSelected(Chunk* target_){
+        selected_ = target_;
+    }
     bool pushAfter(Chunk* target, int pos_x, int pos_y){//returns true if it the created chunk is last in line
         Chunk* temp_pointer_ = new Chunk(pos_x, pos_y);
         if(target->next_ == nullptr){
             target->next_ = temp_pointer_;
             target->next_->previous_ = target;
             temp_pointer_->generateRandom();
+            temp_pointer_ = nullptr;
             return true;
         }else{
             temp_pointer_->next_ = target->next_;
@@ -111,6 +122,7 @@ public:
             temp_pointer_->previous_ = target;
             target->next_ = temp_pointer_;
             temp_pointer_->generateRandom();
+            temp_pointer_ = nullptr;
             return false;
         }
     }
@@ -120,6 +132,7 @@ public:
             target->previous_ = temp_pointer_;
             target->previous_->next_ = target;
             temp_pointer_->generateRandom();
+            temp_pointer_ = nullptr;
             return true;
         }else{
             temp_pointer_->previous_ = target->previous_;
@@ -127,6 +140,7 @@ public:
             temp_pointer_->next_ = target;
             target->previous_ = temp_pointer_;
             temp_pointer_->generateRandom();// TODO: Remove all generandoms
+            temp_pointer_ = nullptr;
             return false;
         }
     }
@@ -141,17 +155,13 @@ public:
         if(selected_->position.y == pos_y){
             if(selected_->position.x < pos_x){
                 direction = 1;
-                cout << "bruh1" << endl;
             }else{
                 direction = -1;
-                cout << "bruh2" << endl;
             }
         }else if(selected_->position.y < pos_y){
             direction = 1;
-                cout << "bruh3" << endl;
         }else{
             direction = -1;
-                cout << "bruh4" << endl;
         }
         while(
             selected_->position.x != pos_x &&

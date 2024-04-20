@@ -13,34 +13,39 @@ int main(){
     World main_world;
 
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE.x, WINDOW_SIZE.y), "KDnD", sf::Style::Fullscreen);
+    window.setFramerateLimit(60);
 
     int clicks = 0;
 
     while(window.isOpen()){
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)){
-			window.close();
-		}
+        sf::Event event;
+        while (window.pollEvent(event)){
+            if (event.type == sf::Event::Closed)
+                window.close();
+            if(event.type == sf::Event::KeyPressed){
+                if(event.key.code == sf::Keyboard::Escape){
+                    window.close();
+                }
+            }
+        }
+        
         if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-            clicks++;
+            sf::Vector2i mouse_position = sf::Mouse::getPosition();
+            main_world.getChunkAt(Chunk::convertToChunkPosition(mouse_position.x, mouse_position.y));
         }
 
         window.clear(sf::Color::Black);
 
-        debug("before reselect", __LINE__);
         main_world.resetSelected();
-        debug("before selefirst", __LINE__);
         main_world.selectFirst();
-        do{
+        do{// TODO: deffinitley change this rendering loop, deffinitley dogshit
             for(int y = 0; y < Chunk::CHUNK_SIZE; y++){
                 for(int x = 0; x < Chunk::CHUNK_SIZE; x++){
-                    debug("copying tile", __LINE__);
                     Tile& tile = main_world.getSelected()->tiles[x][y];
                     if (tile.material.id != 0) {
                         sf::RectangleShape tileShape(sf::Vector2f(1,1)); // Example tile size
-                        debug("before setpos", __LINE__);
                         tileShape.setPosition((main_world.getSelected()->position.x * Chunk::CHUNK_SIZE)+x,
                                                (main_world.getSelected()->position.y * Chunk::CHUNK_SIZE)+y);
-                        debug("before colors", __LINE__);
                         if(tile.material.id == 1){
                             tileShape.setFillColor(sf::Color::Black); // Example color
                         }
@@ -52,16 +57,17 @@ int main(){
                         }else{
                             tileShape.setFillColor(sf::Color::White);
                         }
-                        debug("before drawing", __LINE__);
                         window.draw(tileShape);
                     }
                 }
             }
-            debug("end of dowhile", __LINE__);
+            clicks++;
+            debug(to_string(clicks),__LINE__);
         }while(main_world.selectNext());
         window.display();
-        clicks++;
-        debug("clicks"+clicks, __LINE__);
+        // main_world.selectLast();
+        // main_world.pushAfter(main_world.getSelected(), main_world.getSelected()->position.x+1, main_world.getSelected()->position.y+1);
+        clicks = 0;
     }
     return 0;
 }
