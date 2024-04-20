@@ -19,3 +19,8 @@ int getRandomNumber(int min, int max) {// copied from chatgpt lol
     // Generate and return a random number
     return dist(mt);
 }
+
+void debug(std::string messsage, int line){
+    std::cout << messsage << std::endl << "On line: " << line << std::endl << std::endl << std::endl;
+    // debug("", __LINE__);
+}

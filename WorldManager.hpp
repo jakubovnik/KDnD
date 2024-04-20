@@ -48,9 +48,7 @@ public:
         }
         for(int y = 0; y < CHUNK_SIZE; y++){
             for(int x = 0; x < CHUNK_SIZE; x++){
-                if(tiles[x][y].material.id != 0){
-                    tiles[x][y].setMaterial(getRandomNumber(1,3));
-                }
+                tiles[x][y].setMaterial(getRandomNumber(0,3));// TODO: change this bruh
             }
         }
         generated = true;
@@ -105,12 +103,14 @@ public:
         if(target->next_ == nullptr){
             target->next_ = temp_pointer_;
             target->next_->previous_ = target;
+            temp_pointer_->generateRandom();
             return true;
         }else{
             temp_pointer_->next_ = target->next_;
             target->next_->previous_ = temp_pointer_;
             temp_pointer_->previous_ = target;
             target->next_ = temp_pointer_;
+            temp_pointer_->generateRandom();
             return false;
         }
     }
@@ -119,12 +119,14 @@ public:
         if(target->previous_ == nullptr){
             target->previous_ = temp_pointer_;
             target->previous_->next_ = target;
+            temp_pointer_->generateRandom();
             return true;
         }else{
             temp_pointer_->previous_ = target->previous_;
             target->previous_->next_ = temp_pointer_;
             temp_pointer_->next_ = target;
             target->previous_ = temp_pointer_;
+            temp_pointer_->generateRandom();// TODO: Remove all generandoms
             return false;
         }
     }
