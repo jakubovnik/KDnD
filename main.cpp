@@ -61,8 +61,6 @@ int main(){
                     }
                 }
             }
-            clicks++;
-            debug(to_string(clicks),__LINE__);
         }while(main_world.selectNext());
         window.display();
         // main_world.selectLast();
