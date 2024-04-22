@@ -36,7 +36,7 @@ class Chunk{
 public:
     Chunk* previous_;
     Chunk* next_;
-    static const int CHUNK_SIZE = 8;
+    static const int CHUNK_SIZE = 16;//preferably should be an exponent of 2
     chunk_position position;
     bool generated;
     bool rendered;
@@ -50,8 +50,28 @@ public:
         generated = false;
         rendered = false;
     }
+    ~Chunk(){
+        if(next_ != nullptr || (next_->position.x != 0 && next_->position.y != 0)){
+            delete next_;
+        }
+        if(previous_ != nullptr || (previous_->position.x != 0 && previous_->position.y != 0)){
+            delete previous_;
+        }
+    }
 
-    bool generateRandom(){
+    void clear(int id){
+        for(int y = 0; y < CHUNK_SIZE; y++){
+            for(int x = 0; x < CHUNK_SIZE; x++){
+                tiles[x][y].setMaterial(id);
+            }
+        }
+        generated = false;
+        rendered = false;
+    }
+    void clear(){
+        clear(0);
+    }
+    bool generateRandom(){//this function is EXTREMELY slow, like dogshit level slow (larger chunks => exponencially slow)
         if(generated){
             return false;
         }
@@ -81,7 +101,7 @@ public:
     World():origin_chunk(0,0){
         selected_ = &origin_chunk;
         direction = 0;
-        origin_chunk.generateRandom();
+        origin_chunk.clear();
     }
     void resetSelected(){
         selected_ = &origin_chunk;

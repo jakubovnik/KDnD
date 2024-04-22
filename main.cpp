@@ -22,7 +22,7 @@ int main(){
     screen_sprite.setScale(1.0f, 1.0f);
 
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE.x, WINDOW_SIZE.y), "KDnD", sf::Style::Fullscreen);
-    window.setFramerateLimit(240);
+    window.setFramerateLimit(120);
 
     while(window.isOpen()){
         sf::Event event;
@@ -39,9 +39,17 @@ int main(){
         if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
             sf::Vector2i mouse_position = sf::Mouse::getPosition();
             sf::Vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position.x, mouse_position.y);
-            // cout << mouse_position.x << " " << mouse_position.y << endl;
-            // cout << converted_mouse_position.x << " " << converted_mouse_position.y << endl << endl;
+            main_world.getChunkAt(converted_mouse_position)->clear(1);
+        }
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)){
+            sf::Vector2i mouse_position = sf::Mouse::getPosition();
+            sf::Vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position.x, mouse_position.y);
             main_world.getChunkAt(converted_mouse_position)->generateRandom();
+        }
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
+            sf::Vector2i mouse_position = sf::Mouse::getPosition();
+            sf::Vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position.x, mouse_position.y);
+            main_world.getChunkAt(converted_mouse_position)->clear();
         }
 
         window.clear(sf::Color::Black);
@@ -58,7 +66,7 @@ int main(){
                                             (main_world.getSelected()->position.y * Chunk::CHUNK_SIZE)+y);
                     switch (tile.material.id){
                     case 0:
-                        drawing_pixel.setFillColor(sf::Color::Transparent);
+                        drawing_pixel.setFillColor(sf::Color::Black);
                         break;
                     case 1:
                         drawing_pixel.setFillColor(sf::Color::Blue);
