@@ -14,6 +14,10 @@ struct chunk_position{
 class Tile{
 public:
     tile_material material;
+    Tile(){
+        material.id = 0;
+        material.damage = 0;
+    }
     void damage(unsigned int damage){
         if(material.id == 0){
             return;
@@ -32,9 +36,10 @@ class Chunk{
 public:
     Chunk* previous_;
     Chunk* next_;
-    static const int CHUNK_SIZE = 64;
+    static const int CHUNK_SIZE = 8;
     chunk_position position;
     bool generated;
+    bool rendered;
     Tile tiles[CHUNK_SIZE][CHUNK_SIZE];
 
     Chunk(int x, int y){
@@ -43,6 +48,7 @@ public:
         previous_ = nullptr;
         next_ = nullptr;
         generated = false;
+        rendered = false;
     }
 
     bool generateRandom(){
@@ -51,10 +57,11 @@ public:
         }
         for(int y = 0; y < CHUNK_SIZE; y++){
             for(int x = 0; x < CHUNK_SIZE; x++){
-                tiles[x][y].setMaterial(getRandomNumber(0,3));// TODO: change this to something random
+                tiles[x][y].setMaterial(getRandomNumber(0,3));
             }
         }
-        generated = true;
+        generated = false;//TODO: change this to true, its only false for testing
+        rendered = false;
         return true;
     }
     static sf::Vector2i convertToChunkPosition(int pos_x, int pos_y){
@@ -74,6 +81,7 @@ public:
     World():origin_chunk(0,0){
         selected_ = &origin_chunk;
         direction = 0;
+        origin_chunk.generateRandom();
     }
     void resetSelected(){
         selected_ = &origin_chunk;
@@ -110,37 +118,31 @@ public:
     }
     bool pushAfter(Chunk* target, int pos_x, int pos_y){//returns true if it the created chunk is last in line
         Chunk* temp_pointer_ = new Chunk(pos_x, pos_y);
+        temp_pointer_->generateRandom();
         if(target->next_ == nullptr){
             target->next_ = temp_pointer_;
-            target->next_->previous_ = target;
-            temp_pointer_->generateRandom();
-            temp_pointer_ = nullptr;
+            temp_pointer_->previous_ = target;
             return true;
         }else{
             temp_pointer_->next_ = target->next_;
-            target->next_->previous_ = temp_pointer_;
             temp_pointer_->previous_ = target;
+            target->next_->previous_ = temp_pointer_;
             target->next_ = temp_pointer_;
-            temp_pointer_->generateRandom();
-            temp_pointer_ = nullptr;
             return false;
         }
     }
     bool pushBefore(Chunk* target, int pos_x, int pos_y){//returns true if it the created chunk is first in line
         Chunk* temp_pointer_ = new Chunk(pos_x, pos_y);
+        temp_pointer_->generateRandom();// TODO: Remove all generandoms
         if(target->previous_ == nullptr){
             target->previous_ = temp_pointer_;
             target->previous_->next_ = target;
-            temp_pointer_->generateRandom();
-            temp_pointer_ = nullptr;
             return true;
         }else{
             temp_pointer_->previous_ = target->previous_;
-            target->previous_->next_ = temp_pointer_;
             temp_pointer_->next_ = target;
+            target->previous_->next_ = temp_pointer_;
             target->previous_ = temp_pointer_;
-            temp_pointer_->generateRandom();// TODO: Remove all generandoms
-            temp_pointer_ = nullptr;
             return false;
         }
     }
@@ -148,9 +150,10 @@ public:
         return getChunkAt(position_vector.x, position_vector.y);
     }
     Chunk* getChunkAt(int pos_x, int pos_y){//optimize later cause its propably dogshit
-        if(pos_x == 0, pos_y == 0){
+        if(pos_x == 0 && pos_y == 0){
             return &origin_chunk;
         }
+        direction = 0;
         selected_ = &origin_chunk;
         if(selected_->position.y == pos_y){
             if(selected_->position.x < pos_x){
@@ -164,7 +167,7 @@ public:
             direction = -1;
         }
         while(
-            selected_->position.x != pos_x &&
+            selected_->position.x != pos_x ||
             selected_->position.y != pos_y
         ){
             if(direction > 0){
@@ -198,5 +201,13 @@ public:
             }
         }
         return selected_;
+    }
+    int loadedChunks(){
+        selectFirst();
+        int loaded_chunks = 1;
+        while(selectNext()){
+            loaded_chunks++;
+        }
+        return loaded_chunks;
     }
 };

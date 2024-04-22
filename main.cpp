@@ -12,10 +12,17 @@ int main(){
     
     World main_world;
 
-    sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE.x, WINDOW_SIZE.y), "KDnD", sf::Style::Fullscreen);
-    window.setFramerateLimit(60);
+    sf::RectangleShape drawing_pixel(sf::Vector2f(1,1));
+    sf::RenderTexture screen_texture;
+    screen_texture.create(WINDOW_SIZE.x, WINDOW_SIZE.y);
+    screen_texture.clear(sf::Color::Transparent);
+    screen_texture.display();
+    sf::Sprite screen_sprite;
+    screen_sprite.setTexture(screen_texture.getTexture());
+    screen_sprite.setScale(1.0f, 1.0f);
 
-    int clicks = 0;
+    sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE.x, WINDOW_SIZE.y), "KDnD", sf::Style::Fullscreen);
+    window.setFramerateLimit(240);
 
     while(window.isOpen()){
         sf::Event event;
@@ -31,41 +38,49 @@ int main(){
         
         if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
             sf::Vector2i mouse_position = sf::Mouse::getPosition();
-            main_world.getChunkAt(Chunk::convertToChunkPosition(mouse_position.x, mouse_position.y));
+            sf::Vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position.x, mouse_position.y);
+            // cout << mouse_position.x << " " << mouse_position.y << endl;
+            // cout << converted_mouse_position.x << " " << converted_mouse_position.y << endl << endl;
+            main_world.getChunkAt(converted_mouse_position)->generateRandom();
         }
 
         window.clear(sf::Color::Black);
 
-        main_world.resetSelected();
         main_world.selectFirst();
         do{// TODO: deffinitley change this rendering loop, deffinitley dogshit
+            if(main_world.getSelected()->rendered){
+                continue;
+            }
             for(int y = 0; y < Chunk::CHUNK_SIZE; y++){
                 for(int x = 0; x < Chunk::CHUNK_SIZE; x++){
                     Tile& tile = main_world.getSelected()->tiles[x][y];
-                    if (tile.material.id != 0) {
-                        sf::RectangleShape tileShape(sf::Vector2f(1,1)); // Example tile size
-                        tileShape.setPosition((main_world.getSelected()->position.x * Chunk::CHUNK_SIZE)+x,
-                                               (main_world.getSelected()->position.y * Chunk::CHUNK_SIZE)+y);
-                        if(tile.material.id == 1){
-                            tileShape.setFillColor(sf::Color::Black); // Example color
-                        }
-                        if(tile.material.id == 2){
-                            tileShape.setFillColor(sf::Color::Green); // Example color
-                        }
-                        if(tile.material.id == 3){
-                            tileShape.setFillColor(sf::Color::Red); // Example color
-                        }else{
-                            tileShape.setFillColor(sf::Color::White);
-                        }
-                        window.draw(tileShape);
+                    drawing_pixel.setPosition((main_world.getSelected()->position.x * Chunk::CHUNK_SIZE)+x,
+                                            (main_world.getSelected()->position.y * Chunk::CHUNK_SIZE)+y);
+                    switch (tile.material.id){
+                    case 0:
+                        drawing_pixel.setFillColor(sf::Color::Transparent);
+                        break;
+                    case 1:
+                        drawing_pixel.setFillColor(sf::Color::Blue);
+                        break;
+                    case 2:
+                        drawing_pixel.setFillColor(sf::Color::Green);
+                        break;
+                    case 3:
+                        drawing_pixel.setFillColor(sf::Color::Red);
+                        break;
+                    default:
+                        drawing_pixel.setFillColor(sf::Color::White);
+                        break;
                     }
+                    screen_texture.draw(drawing_pixel);
                 }
             }
+            main_world.getSelected()->rendered = true;
         }while(main_world.selectNext());
+        screen_texture.display();
+        window.draw(screen_sprite);
         window.display();
-        // main_world.selectLast();
-        // main_world.pushAfter(main_world.getSelected(), main_world.getSelected()->position.x+1, main_world.getSelected()->position.y+1);
-        clicks = 0;
     }
     return 0;
 }
