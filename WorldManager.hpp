@@ -1,15 +1,9 @@
-#include "DataManager.hpp"
+#include "UIManager.hpp"
 
 struct tile_material{
     unsigned int id : 8;
     unsigned int damage : 4;
 };
-
-struct chunk_position{
-    int x;
-    int y;
-};
-
 
 class Tile{
 public:
@@ -37,14 +31,12 @@ public:
     Chunk* previous_;
     Chunk* next_;
     static const int CHUNK_SIZE = 16;//preferably should be an exponent of 2
-    chunk_position position;
+    vector2i position;
     bool generated;
     bool rendered;
     Tile tiles[CHUNK_SIZE][CHUNK_SIZE];
 
-    Chunk(int x, int y){
-        position.x = x;
-        position.y = y;
+    Chunk(int x, int y):position(x, y){
         previous_ = nullptr;
         next_ = nullptr;
         generated = false;
@@ -84,8 +76,8 @@ public:
         rendered = false;
         return true;
     }
-    static sf::Vector2i convertToChunkPosition(int pos_x, int pos_y){
-        sf::Vector2i returnPosition;
+    static vector2i convertToChunkPosition(int pos_x, int pos_y){
+        vector2i returnPosition;
         returnPosition.x = (pos_x-(pos_x%CHUNK_SIZE))/CHUNK_SIZE;
         returnPosition.y = (pos_y-(pos_y%CHUNK_SIZE))/CHUNK_SIZE;
         return returnPosition;
@@ -166,7 +158,7 @@ public:
             return false;
         }
     }
-    Chunk* getChunkAt(sf::Vector2i position_vector){
+    Chunk* getChunkAt(vector2i position_vector){
         return getChunkAt(position_vector.x, position_vector.y);
     }
     Chunk* getChunkAt(int pos_x, int pos_y){//optimize later cause its propably dogshit

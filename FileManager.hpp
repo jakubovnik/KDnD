@@ -46,6 +46,20 @@ private:
         }
         file.close();
     }
+    static void saveData(string path, vector<entry> targetVector){
+        ofstream file(path);
+        for(int i = 0; i < targetVector.size(); i++){
+            for(int e = 0; e < to_string(targetVector[i].id).size(); e++){
+                file << "\\" << to_string(targetVector[i].id)[e];
+            }
+            file << ":";
+            for(int e = 0; e < targetVector[i].data.size(); e++){
+                file << "\\" << targetVector[i].data[e];
+            }
+            file << ";" << endl;
+        }
+	    file.close();
+    }
 public:
     static const string MATERIAL_NAME_PATH;
     static const string MATERIAL_HARDNESS_PATH;
@@ -53,6 +67,9 @@ public:
         vector<entry> returnVector;
         loadData(path, returnVector);
         return returnVector;
+    }
+    static void saveEntries(string path, vector<entry> targetVector){
+        saveData(path, targetVector);
     }
 };
 const string FileManager::MATERIAL_NAME_PATH = "./data/material_name.txt";

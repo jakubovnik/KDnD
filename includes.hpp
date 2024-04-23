@@ -4,9 +4,20 @@
 #include <fstream>
 #include <string>
 
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
+class vector2i{
+public:
+    int x;
+    int y;
+    vector2i(){
+        x = 0;
+        y = 0;
+    }
+    vector2i(int pos_x, int pos_y){
+        x = pos_x;
+        y = pos_y;
+    }
+};
+
 // #include "includes.hpp"
 
 int getRandomNumber(int min, int max) {

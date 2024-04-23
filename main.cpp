@@ -1,14 +1,15 @@
 #include "WorldManager.hpp"
+#include <SFML/System.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 
 using namespace std;
 
-
-
-
+sf::Vector2i toSfVector(vector2i target);
 
 int main(){
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::Vector2i WINDOW_SIZE(desktopMode.width, desktopMode.height);
+    vector2i WINDOW_SIZE(desktopMode.width, desktopMode.height);
     
     World main_world;
 
@@ -36,19 +37,19 @@ int main(){
             }
         }
         
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-            sf::Vector2i mouse_position = sf::Mouse::getPosition();
-            sf::Vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position.x, mouse_position.y);
-            main_world.getChunkAt(converted_mouse_position)->clear(1);
-        }
         if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)){
             sf::Vector2i mouse_position = sf::Mouse::getPosition();
-            sf::Vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position.x, mouse_position.y);
+            vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position.x, mouse_position.y);
+            main_world.getChunkAt(converted_mouse_position)->clear(1);
+        }
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+            sf::Vector2i mouse_position = sf::Mouse::getPosition();
+            vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position.x, mouse_position.y);
             main_world.getChunkAt(converted_mouse_position)->generateRandom();
         }
         if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
             sf::Vector2i mouse_position = sf::Mouse::getPosition();
-            sf::Vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position.x, mouse_position.y);
+            vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position.x, mouse_position.y);
             main_world.getChunkAt(converted_mouse_position)->clear();
         }
 
@@ -56,6 +57,15 @@ int main(){
 
         main_world.selectFirst();
         do{// TODO: deffinitley change this rendering loop, deffinitley dogshit
+            if(
+                main_world.getSelected()->position.x*Chunk::CHUNK_SIZE < 0 ||
+                main_world.getSelected()->position.x*Chunk::CHUNK_SIZE > WINDOW_SIZE.x ||
+                main_world.getSelected()->position.y*Chunk::CHUNK_SIZE < 0 ||
+                main_world.getSelected()->position.y*Chunk::CHUNK_SIZE > WINDOW_SIZE.y
+            ){
+                main_world.getSelected()->rendered = false;
+                continue;
+            }
             if(main_world.getSelected()->rendered){
                 continue;
             }
@@ -91,4 +101,8 @@ int main(){
         window.display();
     }
     return 0;
+}
+
+sf::Vector2i toSfVector(vector2i target){
+    return sf::Vector2i(target.x, target.y);
 }
