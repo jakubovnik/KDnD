@@ -37,12 +37,12 @@ private:
         output2 = return2;
     }
     static void loadData(string path, vector<entry>& targetVector){
-        ifstream file(path);
+        fstream file(path);
         string lineInFile;
         entry empty_entry;
         while(getline(file, lineInFile)){
             targetVector.push_back(empty_entry);
-            separateStrings(lineInFile, targetVector[targetVector.size()-1].id, targetVector[targetVector.size()-1].data);
+            separateStrings(lineInFile, targetVector.back().id, targetVector.back().data);
         }
         file.close();
     }
@@ -63,6 +63,7 @@ private:
 public:
     static const string MATERIAL_NAME_PATH;
     static const string MATERIAL_HARDNESS_PATH;
+    static const string MATERIAL_COLOR_PATH;
     static vector<entry> getEntries(string path){
         vector<entry> returnVector;
         loadData(path, returnVector);
@@ -72,5 +73,6 @@ public:
         saveData(path, targetVector);
     }
 };
-const string FileManager::MATERIAL_NAME_PATH = "./data/material_name.txt";
-const string FileManager::MATERIAL_HARDNESS_PATH = "./data/material_hardness.txt";
+const string FileManager::MATERIAL_NAME_PATH = ".\\data\\material_name.txt";
+const string FileManager::MATERIAL_HARDNESS_PATH = ".\\data\\material_hardness.txt";
+const string FileManager::MATERIAL_COLOR_PATH = ".\\data\\material_color.txt";
