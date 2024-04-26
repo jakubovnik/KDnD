@@ -41,6 +41,7 @@ private:
         string lineInFile;
         entry empty_entry;
         while(getline(file, lineInFile)){
+            if(lineInFile == ""){break;}
             targetVector.push_back(empty_entry);
             separateStrings(lineInFile, targetVector.back().id, targetVector.back().data);
         }

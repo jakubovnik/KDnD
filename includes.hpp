@@ -30,6 +30,6 @@ int getRandomNumber(int min, int max) {
 }
 
 void debug(std::string messsage, int line){
-    std::cout << messsage << std::endl << "On line: " << line << std::endl << std::endl << std::endl;
+    std::cout << messsage << std::endl << "On line: " << line << std::endl << std::endl;
     // debug("", __LINE__);
 }

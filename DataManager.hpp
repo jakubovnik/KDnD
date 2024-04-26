@@ -41,9 +41,9 @@ public:
     }
     void splitColorData(string input, unsigned int& red, unsigned int& green, unsigned int& blue){
         int stage = 0;
-        string color_red = "0";
-        string color_green = "0";
-        string color_blue = "0";
+        string color_red = "";
+        string color_green = "";
+        string color_blue = "";
         for(int i = 0; i < input.size(); i++){
             if(input[i] == ','){
                 stage++;
@@ -51,7 +51,6 @@ public:
                 switch(stage){
                     case 0:
                         color_red += input[i];
-                        debug(color_red, __LINE__);
                         break;
                     case 1:
                         color_green += input[i];
