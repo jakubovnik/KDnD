@@ -13,6 +13,7 @@ int main(){
         cin >> choice;
         if(choice == "exit" || choice == "e"){break;}
         else if(choice == "color" || choice == "c"){editing_colors = true;}
+        
 
         while(editing_colors){
             printMaterials(dm);

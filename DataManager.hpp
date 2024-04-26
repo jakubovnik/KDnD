@@ -14,9 +14,12 @@ class DataManager{
 public:
     vector<material> materials;
     DataManager(){
-        vector<entry> material_name = FileManager::getEntries(FileManager::MATERIAL_NAME_PATH);
-        vector<entry> material_hardness = FileManager::getEntries(FileManager::MATERIAL_HARDNESS_PATH);
-        vector<entry> material_color = FileManager::getEntries(FileManager::MATERIAL_COLOR_PATH);
+        vector<entry> material_name;
+        FileManager::getEntries(FileManager::MATERIAL_NAME_PATH, material_name);
+        vector<entry> material_hardness;
+        FileManager::getEntries(FileManager::MATERIAL_HARDNESS_PATH, material_hardness);
+        vector<entry> material_color;
+        FileManager::getEntries(FileManager::MATERIAL_COLOR_PATH, material_color);
         for(int i = 0; i < material_name.size(); i++){
             material insert_material;
             insert_material.name = material_name[i].data;
@@ -38,9 +41,9 @@ public:
     }
     void splitColorData(string input, unsigned int& red, unsigned int& green, unsigned int& blue){
         int stage = 0;
-        string color_red = "";
-        string color_green = "";
-        string color_blue = "";
+        string color_red = "0";
+        string color_green = "0";
+        string color_blue = "0";
         for(int i = 0; i < input.size(); i++){
             if(input[i] == ','){
                 stage++;
@@ -48,6 +51,7 @@ public:
                 switch(stage){
                     case 0:
                         color_red += input[i];
+                        debug(color_red, __LINE__);
                         break;
                     case 1:
                         color_green += input[i];

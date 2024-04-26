@@ -2,5 +2,5 @@ g++ -o .\output\KDnD.exe main.cpp -IC:\SFML\include -LC:\SFML\lib -lsfml-graphic
 
 g++ -o .\output\entryManager.exe entryManager.cpp
 
-.\output\entryManager.exe
-REM .\output\KDnD.exe
+REM .\output\entryManager.exe
+.\output\KDnD.exe
