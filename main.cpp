@@ -56,7 +56,7 @@ int main(){
         window.clear(sf::Color::Black);
 
         main_world.selectFirst();
-        do{// TODO: deffinitley change this rendering loop, deffinitley dogshit
+        do{// TODO: deffinitley change this rendering loop, deffinitley dogshit //TODO: not as dogshit as before, but still bad
             if(
                 main_world.getSelected()->position.x*Chunk::CHUNK_SIZE < 0 ||
                 main_world.getSelected()->position.x*Chunk::CHUNK_SIZE > WINDOW_SIZE.x ||

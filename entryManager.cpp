@@ -1,4 +1,5 @@
 #include "DataManager.hpp"
+#include <windows.h>
 
 void printEntries(vector<entry> target);
 void printMaterials(DataManager& dm);
@@ -9,18 +10,18 @@ int main(){
     bool editing_colors = false;
     while(true){
         string choice;
-        cout << "\n\nPlease input choice\n(c=colorMangement; e=exit)\n: ";
+        cout << "\n\nPlease input choice\n(m=MaterialMangement; e=exit)\n: ";
         cin >> choice;
         if(choice == "exit" || choice == "e"){break;}
-        else if(choice == "color" || choice == "c"){editing_colors = true;}
+        else if(choice == "material" || choice == "m"){editing_colors = true;}
 
 
         while(editing_colors){
-            printMaterials(dm);
+            choice = "";
             cout << endl << "Enter desired action \n(1=add[to back]; 2=remove; 3=edit; e=exit)\n: ";
             cin >> choice;
             if(choice == "e" || choice == "exit"){break;}
-            printMaterials(dm);
+            // printMaterials(dm);
             if(choice == "1"){
                 string insert_name;
                 string insert_hardness;
@@ -132,6 +133,7 @@ int main(){
                     dm.materials[edited_index].b = stoi(insert_b);
                 }
             }
+            
         }
         
         editing_colors = false;
