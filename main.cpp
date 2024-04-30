@@ -5,11 +5,14 @@
 
 using namespace std;
 
-sf::Vector2i toSfVector(vector2i target);
+sf::Vector2i toSfVectorI(vector2i& target);
+vector2i getMousePositionInWindow(sf::RenderWindow& window);
 
 int main(){
+    DataManager dm = DataManager();
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
     vector2i WINDOW_SIZE(desktopMode.width, desktopMode.height);
+    // vector2i WINDOW_SIZE(800,600);
     
     World main_world;
 
@@ -38,25 +41,25 @@ int main(){
         }
         
         if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)){
-            sf::Vector2i mouse_position = sf::Mouse::getPosition();
-            vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position.x, mouse_position.y);
+            vector2i mouse_position = getMousePositionInWindow(window);
+            vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position);
             main_world.getChunkAt(converted_mouse_position)->clear(1);
         }
         if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-            sf::Vector2i mouse_position = sf::Mouse::getPosition();
-            vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position.x, mouse_position.y);
+            vector2i mouse_position = getMousePositionInWindow(window);
+            vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position);
             main_world.getChunkAt(converted_mouse_position)->generateRandom();
         }
         if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
-            sf::Vector2i mouse_position = sf::Mouse::getPosition();
-            vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position.x, mouse_position.y);
+            vector2i mouse_position = getMousePositionInWindow(window);
+            vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position);
             main_world.getChunkAt(converted_mouse_position)->clear();
         }
 
         window.clear(sf::Color::Black);
 
         main_world.selectFirst();
-        do{// TODO: deffinitley change this rendering loop, deffinitley dogshit //TODO: not as dogshit as before, but still bad
+        do{//TODO: not as dogshit as before, but still bad
             if(
                 main_world.getSelected()->position.x*Chunk::CHUNK_SIZE < 0 ||
                 main_world.getSelected()->position.x*Chunk::CHUNK_SIZE > WINDOW_SIZE.x ||
@@ -74,6 +77,16 @@ int main(){
                     Tile& tile = main_world.getSelected()->tiles[x][y];
                     drawing_pixel.setPosition((main_world.getSelected()->position.x * Chunk::CHUNK_SIZE)+x,
                                             (main_world.getSelected()->position.y * Chunk::CHUNK_SIZE)+y);
+                    if(tile.material.id < dm.materials.size()){
+                        drawing_pixel.setFillColor(
+                            sf::Color(
+                                dm.materials[tile.material.id].r,
+                                dm.materials[tile.material.id].g,
+                                dm.materials[tile.material.id].b
+                            ));
+                    }else{
+                        drawing_pixel.setFillColor(sf::Color::White);
+                    }/*
                     switch (tile.material.id){
                     case 0:
                         drawing_pixel.setFillColor(sf::Color::Black);
@@ -90,7 +103,7 @@ int main(){
                     default:
                         drawing_pixel.setFillColor(sf::Color::White);
                         break;
-                    }
+                    }*/
                     screen_texture.draw(drawing_pixel);
                 }
             }
@@ -103,6 +116,11 @@ int main(){
     return 0;
 }
 
-sf::Vector2i toSfVector(vector2i target){
+sf::Vector2i toSfVectorI(vector2i& target){
     return sf::Vector2i(target.x, target.y);
+}
+vector2i getMousePositionInWindow(sf::RenderWindow& window){
+    sf::Vector2i mouse_position = sf::Mouse::getPosition();
+    sf::Vector2i window_position = window.getPosition();
+    return vector2i(mouse_position.x-window_position.x, mouse_position.y-window_position.y);
 }

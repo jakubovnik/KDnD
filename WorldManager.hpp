@@ -30,7 +30,7 @@ class Chunk{
 public:
     Chunk* previous_;
     Chunk* next_;
-    static const int CHUNK_SIZE = 16;//preferably should be an exponent of 2
+    static const int CHUNK_SIZE = 8;//preferably should be an exponent of 2
     vector2i position;
     bool generated;
     bool rendered;
@@ -77,10 +77,13 @@ public:
         return true;
     }
     static vector2i convertToChunkPosition(int pos_x, int pos_y){
-        vector2i returnPosition;
-        returnPosition.x = (pos_x-(pos_x%CHUNK_SIZE))/CHUNK_SIZE;
-        returnPosition.y = (pos_y-(pos_y%CHUNK_SIZE))/CHUNK_SIZE;
-        return returnPosition;
+        return vector2i(
+            (pos_x-(pos_x%CHUNK_SIZE))/CHUNK_SIZE,
+            (pos_y-(pos_y%CHUNK_SIZE))/CHUNK_SIZE
+        );
+    }
+    static vector2i convertToChunkPosition(vector2i pos){
+        return convertToChunkPosition(pos.x, pos.y);
     }
 };
 
@@ -130,7 +133,7 @@ public:
     }
     bool pushAfter(Chunk* target, int pos_x, int pos_y){//returns true if it the created chunk is last in line
         Chunk* temp_pointer_ = new Chunk(pos_x, pos_y);
-        temp_pointer_->generateRandom();
+        // temp_pointer_->generateRandom();
         if(target->next_ == nullptr){
             target->next_ = temp_pointer_;
             temp_pointer_->previous_ = target;
@@ -145,7 +148,7 @@ public:
     }
     bool pushBefore(Chunk* target, int pos_x, int pos_y){//returns true if it the created chunk is first in line
         Chunk* temp_pointer_ = new Chunk(pos_x, pos_y);
-        temp_pointer_->generateRandom();// TODO: Remove all generandoms
+        // temp_pointer_->generateRandom();
         if(target->previous_ == nullptr){
             target->previous_ = temp_pointer_;
             target->previous_->next_ = target;
