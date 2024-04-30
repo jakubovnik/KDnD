@@ -5,6 +5,7 @@
 
 using namespace std;
 
+sf::Color getColorFromMaterial(material& target);
 sf::Vector2i toSfVectorI(vector2i& target);
 vector2i getMousePositionInWindow(sf::RenderWindow& window);
 
@@ -59,7 +60,7 @@ int main(){
         window.clear(sf::Color::Black);
 
         main_world.selectFirst();
-        do{//TODO: not as dogshit as before, but still bad
+        do{//TODO: not as dogshit as before, but still bad rendering (or really good, not really sure)
             if(
                 main_world.getSelected()->position.x*Chunk::CHUNK_SIZE < 0 ||
                 main_world.getSelected()->position.x*Chunk::CHUNK_SIZE > WINDOW_SIZE.x ||
@@ -78,32 +79,10 @@ int main(){
                     drawing_pixel.setPosition((main_world.getSelected()->position.x * Chunk::CHUNK_SIZE)+x,
                                             (main_world.getSelected()->position.y * Chunk::CHUNK_SIZE)+y);
                     if(tile.material.id < dm.materials.size()){
-                        drawing_pixel.setFillColor(
-                            sf::Color(
-                                dm.materials[tile.material.id].r,
-                                dm.materials[tile.material.id].g,
-                                dm.materials[tile.material.id].b
-                            ));
+                        drawing_pixel.setFillColor(getColorFromMaterial(dm.materials[tile.material.id]));
                     }else{
                         drawing_pixel.setFillColor(sf::Color::White);
-                    }/*
-                    switch (tile.material.id){
-                    case 0:
-                        drawing_pixel.setFillColor(sf::Color::Black);
-                        break;
-                    case 1:
-                        drawing_pixel.setFillColor(sf::Color::Blue);
-                        break;
-                    case 2:
-                        drawing_pixel.setFillColor(sf::Color::Green);
-                        break;
-                    case 3:
-                        drawing_pixel.setFillColor(sf::Color::Red);
-                        break;
-                    default:
-                        drawing_pixel.setFillColor(sf::Color::White);
-                        break;
-                    }*/
+                    }
                     screen_texture.draw(drawing_pixel);
                 }
             }
@@ -111,11 +90,19 @@ int main(){
         }while(main_world.selectNext());
         screen_texture.display();
         window.draw(screen_sprite);
+        
         window.display();
     }
     return 0;
 }
 
+sf::Color getColorFromMaterial(material& target){
+    return sf::Color(
+        target.r,
+        target.g,
+        target.b
+    );
+}
 sf::Vector2i toSfVectorI(vector2i& target){
     return sf::Vector2i(target.x, target.y);
 }

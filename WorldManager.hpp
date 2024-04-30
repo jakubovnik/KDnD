@@ -12,7 +12,7 @@ public:
         material.id = 0;
         material.damage = 0;
     }
-    void damage(unsigned int damage){
+    void damage(int damage){
         if(material.id == 0){
             return;
         }
@@ -82,8 +82,16 @@ public:
             (pos_y-(pos_y%CHUNK_SIZE))/CHUNK_SIZE
         );
     }
-    static vector2i convertToChunkPosition(vector2i pos){
+    static vector2i convertToChunkPosition(vector2i& pos){
         return convertToChunkPosition(pos.x, pos.y);
+    }
+};
+
+class WorldPainter{// TODO: figure this shit out
+    int radius;
+public:
+    WorldPainter(){
+        radius = 1;
     }
 };
 
@@ -93,10 +101,14 @@ private:
     Chunk* selected_;
     int direction;//1=forward 2=forwardPass -1=back -2=backPass
 public:
+    WorldPainter* painter_ = nullptr;
     World():origin_chunk(0,0){
         selected_ = &origin_chunk;
         direction = 0;
         origin_chunk.clear();
+    }
+    void setPainter(WorldPainter* painter_pointer){
+        painter_ = painter_pointer;
     }
     void resetSelected(){
         selected_ = &origin_chunk;
@@ -164,12 +176,8 @@ public:
     Chunk* getChunkAt(vector2i position_vector){
         return getChunkAt(position_vector.x, position_vector.y);
     }
-    Chunk* getChunkAt(int pos_x, int pos_y){//optimize later cause its propably dogshit
-        if(pos_x == 0 && pos_y == 0){
-            return &origin_chunk;
-        }
+    Chunk* getChunkAt(int pos_x, int pos_y){//TODO: optimize later cause its propably dogshit
         direction = 0;
-        selected_ = &origin_chunk;
         if(selected_->position.y == pos_y){
             if(selected_->position.x < pos_x){
                 direction = 1;
