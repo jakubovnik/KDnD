@@ -27,7 +27,7 @@ int main(){
     screen_sprite.setScale(1.0f, 1.0f);
 
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE.x, WINDOW_SIZE.y), "KDnD", sf::Style::Fullscreen);
-    window.setFramerateLimit(120);
+    window.setFramerateLimit(4);
 
     while(window.isOpen()){
         sf::Event event;

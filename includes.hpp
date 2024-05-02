@@ -18,6 +18,20 @@ public:
     }
 };
 
+class longVector2i{
+public:
+    long int x;
+    long int y;
+    longVector2i(){
+        x = 0;
+        y = 0;
+    }
+    longVector2i(long int pos_x, long int pos_y){
+        x = pos_x;
+        y = pos_y;
+    }
+};
+
 // #include "includes.hpp"
 
 int getRandomNumber(int min, int max) {

@@ -30,7 +30,7 @@ class Chunk{
 public:
     Chunk* previous_;
     Chunk* next_;
-    static const int CHUNK_SIZE = 8;//preferably should be an exponent of 2
+    static const int CHUNK_SIZE = 32;//preferably should be an exponent of 2
     vector2i position;
     bool generated;
     bool rendered;
@@ -72,7 +72,7 @@ public:
                 tiles[x][y].setMaterial(getRandomNumber(0,3));
             }
         }
-        generated = false;//TODO: change this to true, its only false for testing
+        generated = true;
         rendered = false;
         return true;
     }
@@ -176,7 +176,7 @@ public:
     Chunk* getChunkAt(vector2i position_vector){
         return getChunkAt(position_vector.x, position_vector.y);
     }
-    Chunk* getChunkAt(int pos_x, int pos_y){//TODO: optimize later cause its propably dogshit
+    Chunk* getChunkAt(int pos_x, int pos_y){
         direction = 0;
         if(selected_->position.y == pos_y){
             if(selected_->position.x < pos_x){
@@ -224,6 +224,9 @@ public:
             }
         }
         return selected_;
+    }
+    Tile* getTileAt(long int pos_x, long int pos_y){
+        return &getChunkAt(pos_x,pos_y)->tiles[pos_x%Chunk::CHUNK_SIZE][pos_y%Chunk::CHUNK_SIZE];
     }
     int loadedChunks(){
         selectFirst();
