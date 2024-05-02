@@ -7,7 +7,7 @@ using namespace std;
 
 sf::Color getColorFromMaterial(material& target);
 sf::Vector2i toSfVectorI(vector2i& target);
-vector2i getMousePositionInWindow(sf::RenderWindow& window);
+vector2i getMousePosition();
 
 int main(){
     DataManager dm = DataManager();
@@ -27,7 +27,7 @@ int main(){
     screen_sprite.setScale(1.0f, 1.0f);
 
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE.x, WINDOW_SIZE.y), "KDnD", sf::Style::Fullscreen);
-    window.setFramerateLimit(4);
+    window.setFramerateLimit(10);
 
     while(window.isOpen()){
         sf::Event event;
@@ -42,17 +42,17 @@ int main(){
         }
         
         if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)){
-            vector2i mouse_position = getMousePositionInWindow(window);
+            vector2i mouse_position = getMousePosition();
             vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position);
             main_world.getChunkAt(converted_mouse_position)->clear(1);
         }
         if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-            vector2i mouse_position = getMousePositionInWindow(window);
+            vector2i mouse_position = getMousePosition();
             vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position);
             main_world.getChunkAt(converted_mouse_position)->generateRandom();
         }
         if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
-            vector2i mouse_position = getMousePositionInWindow(window);
+            vector2i mouse_position = getMousePosition();
             vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position);
             main_world.getChunkAt(converted_mouse_position)->clear();
         }
@@ -93,6 +93,7 @@ int main(){
         
         window.display();
     }
+    debug("Chunks: " + to_string(main_world.loadedChunks()), __LINE__);
     return 0;
 }
 
@@ -106,8 +107,7 @@ sf::Color getColorFromMaterial(material& target){
 sf::Vector2i toSfVectorI(vector2i& target){
     return sf::Vector2i(target.x, target.y);
 }
-vector2i getMousePositionInWindow(sf::RenderWindow& window){
+vector2i getMousePosition(){
     sf::Vector2i mouse_position = sf::Mouse::getPosition();
-    sf::Vector2i window_position = window.getPosition();
-    return vector2i(mouse_position.x-window_position.x, mouse_position.y-window_position.y);
+    return vector2i(mouse_position.x, mouse_position.y);
 }

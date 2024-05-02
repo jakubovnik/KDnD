@@ -7,3 +7,4 @@
   - specifically getChunkAt()
 - add players
 - world switching
+- pause program when not in focus

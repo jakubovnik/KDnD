@@ -43,7 +43,13 @@ int getRandomNumber(int min, int max) {
     return distribution(rng);  // Generate and return a random integer
 }
 
-void debug(std::string messsage, int line){
-    std::cout << messsage << std::endl << "On line: " << line << std::endl << std::endl;
+void debug(std::string message, int line){
+    std::cout << message << std::endl << "On line: " << line << std::endl << std::endl;
     // debug("", __LINE__);
+}
+
+void die(std::string message, int line){
+    std::cout << std::endl << std::endl;
+    debug(message, line);
+    exit(1);
 }

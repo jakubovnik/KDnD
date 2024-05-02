@@ -173,26 +173,27 @@ public:
             return false;
         }
     }
-    Chunk* getChunkAt(vector2i position_vector){
-        return getChunkAt(position_vector.x, position_vector.y);
-    }
     Chunk* getChunkAt(int pos_x, int pos_y){
+        if(selected_->position.x == pos_x && selected_->position.y == pos_y){
+            return selected_;
+        }
         direction = 0;
         if(selected_->position.y == pos_y){
             if(selected_->position.x < pos_x){
                 direction = 1;
-            }else{
+            }else if(selected_->position.x > pos_x){
                 direction = -1;
+            }else{
+                die("dir sel 1", __LINE__);
             }
         }else if(selected_->position.y < pos_y){
             direction = 1;
-        }else{
+        }else if(selected_->position.y > pos_y){
             direction = -1;
+        }else{
+            die("dir sel 2", __LINE__);//TODO: continue from here
         }
-        while(
-            selected_->position.x != pos_x ||
-            selected_->position.y != pos_y
-        ){
+        while(!(selected_->position.x == pos_x && selected_->position.y == pos_y)){
             if(direction > 0){
                 if(direction == 2){
                     pushBefore(selected_, pos_x, pos_y);
@@ -219,11 +220,14 @@ public:
                     continue;
                 }
                 if((selected_->position.y == pos_y && selected_->position.x < pos_x) || selected_->position.y < pos_y){
-                    direction = 2;
+                    direction = -2;//AAAAAAAAAAAAAAAAAAAAAAAAa tak tady byl probléééém fuuuUUUUK MMEEEEEE AAAAA (byla kladná 2)
                 }
             }
         }
         return selected_;
+    }
+    Chunk* getChunkAt(vector2i position_vector){
+        return getChunkAt(position_vector.x, position_vector.y);
     }
     Tile* getTileAt(long int pos_x, long int pos_y){
         return &getChunkAt(pos_x,pos_y)->tiles[pos_x%Chunk::CHUNK_SIZE][pos_y%Chunk::CHUNK_SIZE];
