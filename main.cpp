@@ -1,7 +1,4 @@
-#include "WorldManager.hpp"
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
+#include "UIManager.hpp"
 
 using namespace std;
 
@@ -27,7 +24,7 @@ int main(){
     screen_sprite.setScale(1.0f, 1.0f);
 
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE.x, WINDOW_SIZE.y), "KDnD", sf::Style::Fullscreen);
-    window.setFramerateLimit(10);
+    window.setFramerateLimit(120);
 
     while(window.isOpen()){
         sf::Event event;
@@ -39,6 +36,9 @@ int main(){
                     window.close();
                 }
             }
+        }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::R)){
+            main_world.clear();
         }
         
         if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)){
@@ -59,8 +59,15 @@ int main(){
 
         window.clear(sf::Color::Black);
 
+
+        if(main_world.cleared){
+            screen_texture.clear();
+            main_world.cleared = false;
+            main_world.getSelected()->rendered == false;
+        }
+
         main_world.selectFirst();
-        do{//TODO: not as dogshit as before, but still bad rendering (or really good, not really sure)
+        do{//TODO: Fix rendering, not as dogshit as before, but still bad rendering (or really good, not really sure)
             if(
                 main_world.getSelected()->position.x*Chunk::CHUNK_SIZE < 0 ||
                 main_world.getSelected()->position.x*Chunk::CHUNK_SIZE > WINDOW_SIZE.x ||

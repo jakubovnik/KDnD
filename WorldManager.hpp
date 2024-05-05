@@ -42,14 +42,14 @@ public:
         generated = false;
         rendered = false;
     }
-    ~Chunk(){
+    /*~Chunk(){
         if(next_ != nullptr || (next_->position.x != 0 && next_->position.y != 0)){
             delete next_;
         }
         if(previous_ != nullptr || (previous_->position.x != 0 && previous_->position.y != 0)){
             delete previous_;
         }
-    }
+    }*/
 
     void clear(int id){
         for(int y = 0; y < CHUNK_SIZE; y++){
@@ -87,28 +87,19 @@ public:
     }
 };
 
-class WorldPainter{// TODO: figure this shit out
-    int radius;
-public:
-    WorldPainter(){
-        radius = 1;
-    }
-};
-
 class World{
 private:
     Chunk origin_chunk;
     Chunk* selected_;
     int direction;//1=forward 2=forwardPass -1=back -2=backPass
 public:
-    WorldPainter* painter_ = nullptr;
+    bool cleared;
     World():origin_chunk(0,0){
+        origin_chunk.clear();
         selected_ = &origin_chunk;
         direction = 0;
         origin_chunk.clear();
-    }
-    void setPainter(WorldPainter* painter_pointer){
-        painter_ = painter_pointer;
+        cleared = false;
     }
     void resetSelected(){
         selected_ = &origin_chunk;
@@ -173,6 +164,18 @@ public:
             return false;
         }
     }
+    void clear(){
+        resetSelected();
+        int n;
+        for(n = 0; selectNext(); n++){}
+        debug("To delete"+ to_string(n), __LINE__);
+        for(int i = 0; i < n; i++){
+            selectPrevious();
+            delete selected_->next_;
+            selected_->next_ = nullptr;
+        }
+        cleared = true;
+    }
     Chunk* getChunkAt(int pos_x, int pos_y){
         if(selected_->position.x == pos_x && selected_->position.y == pos_y){
             return selected_;
@@ -230,8 +233,13 @@ public:
         return getChunkAt(position_vector.x, position_vector.y);
     }
     Tile* getTileAt(long int pos_x, long int pos_y){
-        return &getChunkAt(pos_x,pos_y)->tiles[pos_x%Chunk::CHUNK_SIZE][pos_y%Chunk::CHUNK_SIZE];
+        return &getChunkAt(Chunk::convertToChunkPosition(pos_x,pos_y))->tiles[pos_x%Chunk::CHUNK_SIZE][pos_y%Chunk::CHUNK_SIZE];
     }
+    void drawTile(long int pos_x, long int pos_y, int id){
+        getTileAt(pos_x, pos_y)->setMaterial(id);
+        getChunkAt(Chunk::convertToChunkPosition(pos_x,pos_y))->rendered = false;
+    }
+    // long int ()
     int loadedChunks(){
         selectFirst();
         int loaded_chunks = 1;
@@ -240,4 +248,6 @@ public:
         }
         return loaded_chunks;
     }
+//Painter part
+
 };
