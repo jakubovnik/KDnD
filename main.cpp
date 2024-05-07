@@ -35,10 +35,10 @@ int main(){
                 if(event.key.code == sf::Keyboard::Escape){
                     window.close();
                 }
+                if(event.key.code == sf::Keyboard::R){//TODO: make this less easy to do
+                    main_world.clear();
+                }
             }
-        }
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::R)){
-            main_world.clear();
         }
         
         if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)){

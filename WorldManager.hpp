@@ -165,14 +165,20 @@ public:
         }
     }
     void clear(){
-        resetSelected();
         int n;
+        resetSelected();
         for(n = 0; selectNext(); n++){}
-        debug("To delete"+ to_string(n), __LINE__);
         for(int i = 0; i < n; i++){
             selectPrevious();
             delete selected_->next_;
             selected_->next_ = nullptr;
+        }
+        resetSelected();
+        for(n = 0; selectPrevious(); n++){}
+        for(int i = 0; i < n; i++){
+            selectNext();
+            delete selected_->previous_;
+            selected_->previous_ = nullptr;
         }
         cleared = true;
     }
@@ -194,7 +200,7 @@ public:
         }else if(selected_->position.y > pos_y){
             direction = -1;
         }else{
-            die("dir sel 2", __LINE__);//TODO: continue from here
+            die("dir sel 2", __LINE__);
         }
         while(!(selected_->position.x == pos_x && selected_->position.y == pos_y)){
             if(direction > 0){
