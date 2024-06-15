@@ -12,7 +12,13 @@ int main(){
     vector2i WINDOW_SIZE(desktopMode.width, desktopMode.height);
     // vector2i WINDOW_SIZE(800,600);
     
-    World main_world;
+    WorldData main_world;
+
+    sf::Font default_font;
+    default_font.loadFromFile("data/fonts/ARIAL.TTF");
+    vector<Indicator> indicators;
+    indicators.push_back(Indicator(default_font));
+    indicators.push_back(Indicator(default_font));
 
     sf::RectangleShape drawing_pixel(sf::Vector2f(1,1));
     sf::RenderTexture screen_texture;
@@ -40,7 +46,9 @@ int main(){
                 }
             }
         }
-        
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
+            main_world.drawCircle(10, 0, 30);
+        }
         if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)){
             vector2i mouse_position = getMousePosition();
             vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position);
@@ -48,13 +56,10 @@ int main(){
         }
         if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
             vector2i mouse_position = getMousePosition();
-            vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position);
-            main_world.getChunkAt(converted_mouse_position)->generateRandom();
+            main_world.drawCircle(mouse_position.x, mouse_position.y, 40);
         }
         if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
-            vector2i mouse_position = getMousePosition();
-            vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position);
-            main_world.getChunkAt(converted_mouse_position)->clear();
+            main_world.clear();
         }
 
         window.clear(sf::Color::Black);
@@ -97,6 +102,15 @@ int main(){
         }while(main_world.selectNext());
         screen_texture.display();
         window.draw(screen_sprite);
+
+
+        // Indicator drawing
+        indicators.at(0).setString(to_string(main_world.loadedChunks()));
+        indicators.at(1).setString(to_string(-5%2));
+        for(int i = 0; i < indicators.size(); i++){
+            indicators.at(i).setPosition(0, i*30);
+            window.draw(indicators.at(i).getText());
+        }
         
         window.display();
     }

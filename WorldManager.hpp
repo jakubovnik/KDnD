@@ -42,7 +42,7 @@ public:
         generated = false;
         rendered = false;
     }
-    /*~Chunk(){
+    /*~Chunk(){//not sure if its even nescessary
         if(next_ != nullptr || (next_->position.x != 0 && next_->position.y != 0)){
             delete next_;
         }
@@ -63,7 +63,7 @@ public:
     void clear(){
         clear(0);
     }
-    bool generateRandom(){//this function is EXTREMELY slow, like dogshit level slow (larger chunks => exponencially slow)
+    bool generateRandom(){//this function is EXTREMELY slow, like dogshit level slow (larger chunks => exponencially slow(yah like O(n^2) level bad))
         if(generated){
             return false;
         }
@@ -77,9 +77,16 @@ public:
         return true;
     }
     static vector2i convertToChunkPosition(int pos_x, int pos_y){
+        vector2i negative_offset;
+        if(pos_x < 0){
+            negative_offset.x = -1;
+        }
+        if(pos_y < 0){
+            negative_offset.y = -1;
+        }
         return vector2i(
-            (pos_x-(pos_x%CHUNK_SIZE))/CHUNK_SIZE,
-            (pos_y-(pos_y%CHUNK_SIZE))/CHUNK_SIZE
+            (pos_x-(pos_x%CHUNK_SIZE))/CHUNK_SIZE + negative_offset.x,
+            (pos_y-(pos_y%CHUNK_SIZE))/CHUNK_SIZE + negative_offset.y
         );
     }
     static vector2i convertToChunkPosition(vector2i& pos){
@@ -87,14 +94,14 @@ public:
     }
 };
 
-class World{
+class WorldData{
 private:
     Chunk origin_chunk;
     Chunk* selected_;
     int direction;//1=forward 2=forwardPass -1=back -2=backPass
 public:
     bool cleared;
-    World():origin_chunk(0,0){
+    WorldData():origin_chunk(0,0){
         origin_chunk.clear();
         selected_ = &origin_chunk;
         direction = 0;
@@ -193,14 +200,14 @@ public:
             }else if(selected_->position.x > pos_x){
                 direction = -1;
             }else{
-                die("dir sel 1", __LINE__);
+                die("dir sel 1, somehow nonexistant direction", __LINE__);
             }
         }else if(selected_->position.y < pos_y){
             direction = 1;
         }else if(selected_->position.y > pos_y){
             direction = -1;
         }else{
-            die("dir sel 2", __LINE__);
+            die("dir sel 2, somehow nonexistant direction", __LINE__);
         }
         while(!(selected_->position.x == pos_x && selected_->position.y == pos_y)){
             if(direction > 0){
@@ -239,13 +246,26 @@ public:
         return getChunkAt(position_vector.x, position_vector.y);
     }
     Tile* getTileAt(long int pos_x, long int pos_y){
-        return &getChunkAt(Chunk::convertToChunkPosition(pos_x,pos_y))->tiles[pos_x%Chunk::CHUNK_SIZE][pos_y%Chunk::CHUNK_SIZE];
+        return &getChunkAt(Chunk::convertToChunkPosition(pos_x,pos_y))->tiles[abs(pos_x%Chunk::CHUNK_SIZE)][abs(pos_y%Chunk::CHUNK_SIZE)];//Remember: modulo can return negative numbers :P
     }
     void drawTile(long int pos_x, long int pos_y, int id){
         getTileAt(pos_x, pos_y)->setMaterial(id);
         getChunkAt(Chunk::convertToChunkPosition(pos_x,pos_y))->rendered = false;
     }
-    // long int ()
+    int drawCircle(long int pos_x, long int pos_y, int radius){
+        int pixels_drawn = 0;
+        for(long int y = pos_y-radius; y < pos_y+radius; y++){
+            for(long int x = pos_x-radius; x < pos_x+radius; x++){
+                if(sqrt((pos_x-x)*(pos_x-x) + (pos_y-y)*(pos_y-y))
+                    <=
+                    radius
+                ){
+                    this->drawTile(x,y, 1);
+                }
+            }
+        }
+        return pixels_drawn;
+    }
     int loadedChunks(){
         selectFirst();
         int loaded_chunks = 1;
@@ -254,6 +274,4 @@ public:
         }
         return loaded_chunks;
     }
-//Painter part
-
 };
