@@ -25,3 +25,16 @@ public:
         text.setPosition(x, y);
     }
 };
+
+class RenderData{
+    vector2i window_size;
+    int ratio;
+public:
+    longVector2i scroll;
+    RenderData(vector2i target_window_size){
+        scroll.x = 0;
+        scroll.y = 0;
+        window_size = target_window_size;
+        ratio = 10;
+    }
+};

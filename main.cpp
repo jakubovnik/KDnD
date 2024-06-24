@@ -58,7 +58,7 @@ int main(){
             vector2i mouse_position = getMousePosition();
             main_world.drawCircle(mouse_position.x, mouse_position.y, 40);
         }
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){// change this to something else
             main_world.clear();
         }
 
