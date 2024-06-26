@@ -7,13 +7,16 @@ sf::Vector2i toSfVectorI(vector2i& target);
 vector2i getMousePosition();
 
 int main(){
-    DataManager dm = DataManager();
+    //getting window data
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
     vector2i WINDOW_SIZE(desktopMode.width, desktopMode.height);
-    // vector2i WINDOW_SIZE(800,600);
-    
+    //setting manager objects
+    RenderData rd = RenderData(WINDOW_SIZE);
+    DataManager dm = DataManager();
     WorldData main_world;
+    // vector2i WINDOW_SIZE(800,600);
 
+    //setting text stuff
     sf::Font default_font;
     default_font.loadFromFile("data/fonts/ARIAL.TTF");
     vector<Indicator> indicators;
@@ -32,8 +35,15 @@ int main(){
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE.x, WINDOW_SIZE.y), "KDnD", sf::Style::Fullscreen);
     window.setFramerateLimit(120);
 
-    while(window.isOpen()){
+    //testing variables (TODO: remove later)
+    vector2i starting_mouse_pos;
+    vector2i ending_mouse_pos;
+    bool middle_held_down = false;
+    vector2i mouse_pos;
+
+    while(window.isOpen()){/////////////////////////////////////////////////////////////////////////////////////////main loop
         sf::Event event;
+        mouse_pos = getMousePosition();
         while (window.pollEvent(event)){
             if (event.type == sf::Event::Closed)
                 window.close();
@@ -45,6 +55,21 @@ int main(){
                     main_world.clear();
                 }
             }
+            if(event.type == sf::Event::MouseButtonPressed){
+                if(event.key.code == sf::Mouse::Button::Middle){
+                    starting_mouse_pos = mouse_pos;
+                    middle_held_down = true;
+                }
+            }
+            if(event.type == sf::Event::MouseButtonReleased){
+                if(event.key.code == sf::Mouse::Button::Middle){
+                    ending_mouse_pos = mouse_pos;
+                    middle_held_down = false;
+                }
+            }
+        }
+        if(middle_held_down){
+            ending_mouse_pos = mouse_pos;
         }
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             main_world.drawCircle(10, 0, 30);
@@ -58,9 +83,8 @@ int main(){
             vector2i mouse_position = getMousePosition();
             main_world.drawCircle(mouse_position.x, mouse_position.y, 40);
         }
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){// change this to something else
-            main_world.clear();
-        }
+
+        rd.update();
 
         window.clear(sf::Color::Black);
 
@@ -72,12 +96,12 @@ int main(){
         }
 
         main_world.selectFirst();
-        do{//TODO: Fix rendering, not as dogshit as before, but still bad rendering (or really good, not really sure)
+        do{//TODO: Fix rendering, not as dogshit as before, but still bad rendering (or really good, not really sure) also make it work with threads
             if(
-                main_world.getSelected()->position.x*Chunk::CHUNK_SIZE < 0 ||
-                main_world.getSelected()->position.x*Chunk::CHUNK_SIZE > WINDOW_SIZE.x ||
-                main_world.getSelected()->position.y*Chunk::CHUNK_SIZE < 0 ||
-                main_world.getSelected()->position.y*Chunk::CHUNK_SIZE > WINDOW_SIZE.y
+                rd.scroll.x + main_world.getSelected()->position.x*Chunk::CHUNK_SIZE < 0 ||
+                rd.scroll.x + main_world.getSelected()->position.x*Chunk::CHUNK_SIZE > WINDOW_SIZE.x ||
+                rd.scroll.y + main_world.getSelected()->position.y*Chunk::CHUNK_SIZE < 0 ||
+                rd.scroll.y + main_world.getSelected()->position.y*Chunk::CHUNK_SIZE > WINDOW_SIZE.y
             ){
                 main_world.getSelected()->rendered = false;
                 continue;
@@ -103,10 +127,13 @@ int main(){
         screen_texture.display();
         window.draw(screen_sprite);
 
-
-        // Indicator drawing
+        // Indicator updating
         indicators.at(0).setString(to_string(main_world.loadedChunks()));
-        indicators.at(1).setString(to_string(-5%2));
+        indicators.at(1).setString(
+            "x: " + to_string(ending_mouse_pos.x-starting_mouse_pos.x) + " " +
+            "y: " + to_string(ending_mouse_pos.y-starting_mouse_pos.y)
+        );
+        // Indicator drawing
         for(int i = 0; i < indicators.size(); i++){
             indicators.at(i).setPosition(0, i*30);
             window.draw(indicators.at(i).getText());

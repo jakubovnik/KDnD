@@ -28,7 +28,8 @@ public:
 
 class RenderData{
     vector2i window_size;
-    int ratio;
+    float ratio;
+    float target_ratio;
 public:
     longVector2i scroll;
     RenderData(vector2i target_window_size){
@@ -36,5 +37,18 @@ public:
         scroll.y = 0;
         window_size = target_window_size;
         ratio = 10;
+        target_ratio = ratio;
+    }
+    void changeRatio(int number){//similar to setRatio, but only changes target_ratio, so that the ratio can be changed gradually instead of instantly (that update() uses)
+        target_ratio = number;
+    }
+    void setRatio(float number){
+        ratio = number;
+    }
+    // float increaseRatio(){
+        
+    // }
+    void update(){
+        ratio =+ (target_ratio-ratio)/20;
     }
 };

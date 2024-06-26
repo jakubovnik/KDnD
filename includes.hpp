@@ -35,7 +35,7 @@ public:
 
 // #include "includes.hpp"
 
-int getRandomNumber(int min, int max) {
+int getRandomNumber(int min, int max) {// copied from chatGPT lol, is very slow propably and very bad :/
     // Initialize a random device to seed the random number engine
     std::random_device rd;
     std::mt19937 rng(rd());  // Mersenne Twister 19937 random number generator
