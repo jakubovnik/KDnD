@@ -33,6 +33,21 @@ public:
     }
 };
 
+vector2i convertVector(longVector2i target){//use this carefully
+    return vector2i(target.x, target.y);
+}
+longVector2i convertVector(vector2i target){//use this carefully
+    return longVector2i(target.x, target.y);
+}
+vector2i addVectorsI(vector2i& vector1, vector2i& vector2){
+    return vector2i(vector1.x+vector2.x,vector1.y+vector2.y);
+}
+longVector2i addVectorsI(longVector2i& vector1, vector2i& vector2){
+    return longVector2i(vector1.x+vector2.x,vector1.y+vector2.y);
+}
+vector2i flipVector(vector2i& target){
+    return vector2i(-target.x, -target.y);
+}
 // #include "includes.hpp"
 
 int getRandomNumber(int min, int max) {// copied from chatGPT lol, is very slow propably and very bad :/

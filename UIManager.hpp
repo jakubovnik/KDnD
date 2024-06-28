@@ -9,7 +9,7 @@ class Indicator{
     sf::Texture texture;
 public:
     Indicator(sf::Font& targetFont){
-        setString("");
+        setString("initialized");
         font = &targetFont;
         text.setFont(*font);
         text.setCharacterSize(24);
@@ -30,14 +30,41 @@ class RenderData{
     vector2i window_size;
     float ratio;
     float target_ratio;
-public:
+    bool smooth_scroll;
+    bool commit_scroll;
     longVector2i scroll;
+    longVector2i target_scroll;
+public:
     RenderData(vector2i target_window_size){
-        scroll.x = 0;
-        scroll.y = 0;
         window_size = target_window_size;
-        ratio = 10;
-        target_ratio = ratio;
+        ratio = 1;
+        target_ratio = 10;
+        commit_scroll = true;
+        smooth_scroll = false;
+    }
+    longVector2i& getScroll(){
+        if(commit_scroll == false){
+            return target_scroll;
+        }
+        return scroll;
+    }
+    longVector2i& getScroll(vector2i& difference){
+        target_scroll = addVectorsI(scroll, difference);
+        return target_scroll;
+    }
+    void setScroll(longVector2i target){
+        scroll = target;
+        target_scroll = target;
+    }
+    void changeScroll(longVector2i target){
+        target_scroll = target;
+    }
+    void openScroll(){
+        commit_scroll = false;
+    }
+    void commitScroll(){
+        commit_scroll = true;
+        scroll = target_scroll;
     }
     void changeRatio(int number){//similar to setRatio, but only changes target_ratio, so that the ratio can be changed gradually instead of instantly (that update() uses)
         target_ratio = number;
@@ -45,10 +72,46 @@ public:
     void setRatio(float number){
         ratio = number;
     }
+    float getRatio(){
+        return ratio;
+    }
     // float increaseRatio(){
-        
     // }
     void update(){
+        if(commit_scroll){
+            if(smooth_scroll){
+                //TODO: finish smooth scrolling
+            }else{
+                scroll = target_scroll;
+            }
+        }
         ratio =+ (target_ratio-ratio)/20;
     }
 };
+
+sf::Color getColorFromMaterial(material& target){
+    return sf::Color(
+        target.r,
+        target.g,
+        target.b
+    );
+}
+sf::Vector2i toSfVectorI(vector2i& target){
+    return sf::Vector2i(target.x, target.y);
+}
+sf::Vector2i toSfVectorI(longVector2i& target){
+    return sf::Vector2i(target.x, target.y);
+}
+sf::Vector2f toSfVectorF(longVector2i target){
+    return sf::Vector2f(target.x, target.y);
+}
+vector2i fromSfVectorI(sf::Vector2i target){
+    return vector2i(target.x, target.y);
+}
+vector2i fromSfVectorI(sf::Vector2f target){
+    return vector2i(target.x, target.y);
+}
+vector2i getMousePosition(){
+    sf::Vector2i mouse_position = sf::Mouse::getPosition();
+    return vector2i(mouse_position.x, mouse_position.y);
+}

@@ -2,10 +2,6 @@
 
 using namespace std;
 
-sf::Color getColorFromMaterial(material& target);
-sf::Vector2i toSfVectorI(vector2i& target);
-vector2i getMousePosition();
-
 int main(){
     //getting window data
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
@@ -22,6 +18,8 @@ int main(){
     vector<Indicator> indicators;
     indicators.push_back(Indicator(default_font));
     indicators.push_back(Indicator(default_font));
+    indicators.push_back(Indicator(default_font));
+    indicators.push_back(Indicator(default_font));
 
     sf::RectangleShape drawing_pixel(sf::Vector2f(1,1));
     sf::RenderTexture screen_texture;
@@ -35,9 +33,11 @@ int main(){
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE.x, WINDOW_SIZE.y), "KDnD", sf::Style::Fullscreen);
     window.setFramerateLimit(120);
 
-    //testing variables (TODO: remove later)
+    //testing variables (TODO: remove or improve later)
+    vector2i temp_vector;
+    longVector2i temp_long_vector;
     vector2i starting_mouse_pos;
-    vector2i ending_mouse_pos;
+    vector2i mouse_difference;
     bool middle_held_down = false;
     vector2i mouse_pos;
 
@@ -56,20 +56,24 @@ int main(){
                 }
             }
             if(event.type == sf::Event::MouseButtonPressed){
-                if(event.key.code == sf::Mouse::Button::Middle){
+                if(event.mouseButton.button == sf::Mouse::Button::Middle){
+                    rd.openScroll();
                     starting_mouse_pos = mouse_pos;
                     middle_held_down = true;
                 }
             }
             if(event.type == sf::Event::MouseButtonReleased){
-                if(event.key.code == sf::Mouse::Button::Middle){
-                    ending_mouse_pos = mouse_pos;
+                if(event.mouseButton.button == sf::Mouse::Button::Middle){
+                    rd.commitScroll();
+                    mouse_difference = mouse_pos;
                     middle_held_down = false;
                 }
             }
         }
         if(middle_held_down){
-            ending_mouse_pos = mouse_pos;
+            temp_vector = flipVector(starting_mouse_pos);
+            mouse_difference = addVectorsI(mouse_pos, temp_vector);
+            rd.getScroll(mouse_difference);
         }
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             main_world.drawCircle(10, 0, 30);
@@ -98,10 +102,10 @@ int main(){
         main_world.selectFirst();
         do{//TODO: Fix rendering, not as dogshit as before, but still bad rendering (or really good, not really sure) also make it work with threads
             if(
-                rd.scroll.x + main_world.getSelected()->position.x*Chunk::CHUNK_SIZE < 0 ||
-                rd.scroll.x + main_world.getSelected()->position.x*Chunk::CHUNK_SIZE > WINDOW_SIZE.x ||
-                rd.scroll.y + main_world.getSelected()->position.y*Chunk::CHUNK_SIZE < 0 ||
-                rd.scroll.y + main_world.getSelected()->position.y*Chunk::CHUNK_SIZE > WINDOW_SIZE.y
+                rd.getScroll().x + main_world.getSelected()->position.x*Chunk::CHUNK_SIZE < 0 ||
+                rd.getScroll().x + main_world.getSelected()->position.x*Chunk::CHUNK_SIZE > WINDOW_SIZE.x ||
+                rd.getScroll().y + main_world.getSelected()->position.y*Chunk::CHUNK_SIZE < 0 ||
+                rd.getScroll().y + main_world.getSelected()->position.y*Chunk::CHUNK_SIZE > WINDOW_SIZE.y
             ){
                 main_world.getSelected()->rendered = false;
                 continue;
@@ -125,14 +129,20 @@ int main(){
             main_world.getSelected()->rendered = true;
         }while(main_world.selectNext());
         screen_texture.display();
+        screen_sprite.setPosition(toSfVectorF(rd.getScroll()));
         window.draw(screen_sprite);
 
         // Indicator updating
         indicators.at(0).setString(to_string(main_world.loadedChunks()));
         indicators.at(1).setString(
-            "x: " + to_string(ending_mouse_pos.x-starting_mouse_pos.x) + " " +
-            "y: " + to_string(ending_mouse_pos.y-starting_mouse_pos.y)
+            "x: " + to_string(mouse_pos.x-starting_mouse_pos.x) + " " +
+            "y: " + to_string(mouse_pos.y-starting_mouse_pos.y)
         );
+        indicators.at(2).setString(
+            "x: " + to_string(rd.getScroll().x) + " " +
+            "y: " + to_string(rd.getScroll().y)
+        );
+        indicators.at(3).setString(to_string(rd.getRatio()));
         // Indicator drawing
         for(int i = 0; i < indicators.size(); i++){
             indicators.at(i).setPosition(0, i*30);
@@ -145,17 +155,3 @@ int main(){
     return 0;
 }
 
-sf::Color getColorFromMaterial(material& target){
-    return sf::Color(
-        target.r,
-        target.g,
-        target.b
-    );
-}
-sf::Vector2i toSfVectorI(vector2i& target){
-    return sf::Vector2i(target.x, target.y);
-}
-vector2i getMousePosition(){
-    sf::Vector2i mouse_position = sf::Mouse::getPosition();
-    return vector2i(mouse_position.x, mouse_position.y);
-}
