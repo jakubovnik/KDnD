@@ -48,8 +48,9 @@ public:
         }
         return scroll;
     }
-    longVector2i& getScroll(vector2i& difference){
-        target_scroll = addVectorsI(scroll, difference);
+    longVector2i& addScroll(vector2i& difference){
+        vector2i temp_vector = flipVector(difference);
+        target_scroll = addVectorsI(scroll, temp_vector);
         return target_scroll;
     }
     void setScroll(longVector2i target){
@@ -114,4 +115,8 @@ vector2i fromSfVectorI(sf::Vector2f target){
 vector2i getMousePosition(){
     sf::Vector2i mouse_position = sf::Mouse::getPosition();
     return vector2i(mouse_position.x, mouse_position.y);
+}
+vector2i getRelativeMousePosition(RenderData& rd){
+    vector2i absolute_mouse_position = getMousePosition();
+    return vector2i(absolute_mouse_position.x+rd.getScroll().x, absolute_mouse_position.y+rd.getScroll().y);
 }

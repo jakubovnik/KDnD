@@ -33,6 +33,8 @@ public:
     }
 };
 
+
+
 vector2i convertVector(longVector2i target){//use this carefully
     return vector2i(target.x, target.y);
 }
@@ -47,6 +49,9 @@ longVector2i addVectorsI(longVector2i& vector1, vector2i& vector2){
 }
 vector2i flipVector(vector2i& target){
     return vector2i(-target.x, -target.y);
+}
+longVector2i flipVector(longVector2i& target){
+    return longVector2i(-target.x, -target.y);
 }
 // #include "includes.hpp"
 

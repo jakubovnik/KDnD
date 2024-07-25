@@ -252,15 +252,18 @@ public:
         getTileAt(pos_x, pos_y)->setMaterial(id);
         getChunkAt(Chunk::convertToChunkPosition(pos_x,pos_y))->rendered = false;
     }
-    int drawCircle(long int pos_x, long int pos_y, int radius){
+    int drawCircle(long int pos_x, long int pos_y, int radius){ //TODO: this can be improved
         int pixels_drawn = 0;
-        for(long int y = pos_y-radius; y < pos_y+radius; y++){
-            for(long int x = pos_x-radius; x < pos_x+radius; x++){
-                if(sqrt((pos_x-x)*(pos_x-x) + (pos_y-y)*(pos_y-y))
+        vector2i top_left = vector2i(pos_x-radius, pos_y-radius);
+
+        for(long int y = 0; y < 2*radius; y++){
+            for(long int x = 0; x < 2*radius; x++){
+                if(sqrt((radius-x)*(radius-x) + (radius-y)*(radius-y))
                     <=
                     radius
                 ){
-                    this->drawTile(x,y, 1);
+                    this->drawTile(x+top_left.x,y+top_left.y, 1);
+                    pixels_drawn++;
                 }
             }
         }

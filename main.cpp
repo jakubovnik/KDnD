@@ -20,6 +20,7 @@ int main(){
     indicators.push_back(Indicator(default_font));
     indicators.push_back(Indicator(default_font));
     indicators.push_back(Indicator(default_font));
+    indicators.push_back(Indicator(default_font));
 
     sf::RectangleShape drawing_pixel(sf::Vector2f(1,1));
     sf::RenderTexture screen_texture;
@@ -40,6 +41,7 @@ int main(){
     vector2i mouse_difference;
     bool middle_held_down = false;
     vector2i mouse_pos;
+    int rendered_chunks = 0;
 
     while(window.isOpen()){/////////////////////////////////////////////////////////////////////////////////////////main loop
         sf::Event event;
@@ -73,18 +75,17 @@ int main(){
         if(middle_held_down){
             temp_vector = flipVector(starting_mouse_pos);
             mouse_difference = addVectorsI(mouse_pos, temp_vector);
-            rd.getScroll(mouse_difference);
+            rd.addScroll(mouse_difference);
+            main_world.selectFirst();
+            do{
+                main_world.getSelected()->rendered = false;
+            }while(main_world.selectNext());
         }
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             main_world.drawCircle(10, 0, 30);
         }
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)){
-            vector2i mouse_position = getMousePosition();
-            vector2i converted_mouse_position = Chunk::convertToChunkPosition(mouse_position);
-            main_world.getChunkAt(converted_mouse_position)->clear(1);
-        }
         if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-            vector2i mouse_position = getMousePosition();
+            vector2i mouse_position = getRelativeMousePosition(rd);
             main_world.drawCircle(mouse_position.x, mouse_position.y, 40);
         }
 
@@ -99,25 +100,27 @@ int main(){
             main_world.getSelected()->rendered == false;
         }
 
+        rendered_chunks = 0;
         main_world.selectFirst();
         do{//TODO: Fix rendering, not as dogshit as before, but still bad rendering (or really good, not really sure) also make it work with threads
             if(
-                rd.getScroll().x + main_world.getSelected()->position.x*Chunk::CHUNK_SIZE < 0 ||
-                rd.getScroll().x + main_world.getSelected()->position.x*Chunk::CHUNK_SIZE > WINDOW_SIZE.x ||
-                rd.getScroll().y + main_world.getSelected()->position.y*Chunk::CHUNK_SIZE < 0 ||
-                rd.getScroll().y + main_world.getSelected()->position.y*Chunk::CHUNK_SIZE > WINDOW_SIZE.y
+                main_world.getSelected()->position.x*Chunk::CHUNK_SIZE < 0 + rd.getScroll().x ||
+                main_world.getSelected()->position.x*Chunk::CHUNK_SIZE > WINDOW_SIZE.x + rd.getScroll().x ||
+                main_world.getSelected()->position.y*Chunk::CHUNK_SIZE < 0 + rd.getScroll().y ||
+                main_world.getSelected()->position.y*Chunk::CHUNK_SIZE > WINDOW_SIZE.y + rd.getScroll().y
             ){
                 main_world.getSelected()->rendered = false;
                 continue;
             }
+            rendered_chunks++;
             if(main_world.getSelected()->rendered){
                 continue;
             }
             for(int y = 0; y < Chunk::CHUNK_SIZE; y++){
                 for(int x = 0; x < Chunk::CHUNK_SIZE; x++){
                     Tile& tile = main_world.getSelected()->tiles[x][y];
-                    drawing_pixel.setPosition((main_world.getSelected()->position.x * Chunk::CHUNK_SIZE)+x,
-                                            (main_world.getSelected()->position.y * Chunk::CHUNK_SIZE)+y);
+                    drawing_pixel.setPosition((main_world.getSelected()->position.x * Chunk::CHUNK_SIZE)+x - rd.getScroll().x,
+                                            (main_world.getSelected()->position.y * Chunk::CHUNK_SIZE)+y - rd.getScroll().y);
                     if(tile.material.id < dm.materials.size()){
                         drawing_pixel.setFillColor(getColorFromMaterial(dm.materials[tile.material.id]));
                     }else{
@@ -129,7 +132,7 @@ int main(){
             main_world.getSelected()->rendered = true;
         }while(main_world.selectNext());
         screen_texture.display();
-        screen_sprite.setPosition(toSfVectorF(rd.getScroll()));
+        // screen_sprite.setPosition(toSfVectorF(flipVector(rd.getScroll())));
         window.draw(screen_sprite);
 
         // Indicator updating
@@ -143,6 +146,7 @@ int main(){
             "y: " + to_string(rd.getScroll().y)
         );
         indicators.at(3).setString(to_string(rd.getRatio()));
+        indicators.at(4).setString(to_string(rendered_chunks));
         // Indicator drawing
         for(int i = 0; i < indicators.size(); i++){
             indicators.at(i).setPosition(0, i*30);
