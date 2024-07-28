@@ -262,7 +262,7 @@ public:
                     <=
                     radius
                 ){
-                    this->drawTile(x+top_left.x,y+top_left.y, 1);
+                    drawTile(x+top_left.x,y+top_left.y, 1);
                     pixels_drawn++;
                 }
             }

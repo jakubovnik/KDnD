@@ -34,6 +34,7 @@ class RenderData{
     bool commit_scroll;
     longVector2i scroll;
     longVector2i target_scroll;
+    vector<int> ratios;
 public:
     RenderData(vector2i target_window_size){
         window_size = target_window_size;

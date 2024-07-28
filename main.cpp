@@ -24,6 +24,7 @@ int main(){
 
     sf::RectangleShape drawing_pixel(sf::Vector2f(1,1));
     sf::RenderTexture screen_texture;
+    screen_texture.setSmooth(true);
     screen_texture.create(WINDOW_SIZE.x, WINDOW_SIZE.y);
     screen_texture.clear(sf::Color::Transparent);
     screen_texture.display();
@@ -80,6 +81,7 @@ int main(){
             do{
                 main_world.getSelected()->rendered = false;
             }while(main_world.selectNext());
+            screen_texture.clear();
         }
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             main_world.drawCircle(10, 0, 30);
