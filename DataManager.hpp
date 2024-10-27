@@ -28,7 +28,7 @@ public:
             materials.push_back(insert_material);
         }
     }
-    entry findEntryById(vector<entry> target_entry, unsigned int id){
+    entry findEntryById(vector<entry>& target_entry, unsigned int id){
         for(int i = 0; i < target_entry.size(); i++){
             if(target_entry[i].id == id){
                 return target_entry[i];

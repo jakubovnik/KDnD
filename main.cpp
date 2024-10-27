@@ -59,14 +59,14 @@ int main(){
                 }
             }
             if(event.type == sf::Event::MouseButtonPressed){
-                if(event.mouseButton.button == sf::Mouse::Button::Middle){
+                if(event.mouseButton.button == sf::Mouse::Button::Right){
                     rd.openScroll();
                     starting_mouse_pos = mouse_pos;
                     middle_held_down = true;
                 }
             }
             if(event.type == sf::Event::MouseButtonReleased){
-                if(event.mouseButton.button == sf::Mouse::Button::Middle){
+                if(event.mouseButton.button == sf::Mouse::Button::Right){
                     rd.commitScroll();
                     mouse_difference = mouse_pos;
                     middle_held_down = false;

@@ -36,7 +36,7 @@ class RenderData{
     longVector2i target_scroll;
     vector<int> ratios;
 public:
-    RenderData(vector2i target_window_size){
+    RenderData(vector2i& target_window_size){
         window_size = target_window_size;
         ratio = 1;
         target_ratio = 10;
@@ -54,11 +54,11 @@ public:
         target_scroll = addVectorsI(scroll, temp_vector);
         return target_scroll;
     }
-    void setScroll(longVector2i target){
+    void setScroll(longVector2i& target){
         scroll = target;
         target_scroll = target;
     }
-    void changeScroll(longVector2i target){
+    void changeScroll(longVector2i& target){
         target_scroll = target;
     }
     void openScroll(){
@@ -104,13 +104,13 @@ sf::Vector2i toSfVectorI(vector2i& target){
 sf::Vector2i toSfVectorI(longVector2i& target){
     return sf::Vector2i(target.x, target.y);
 }
-sf::Vector2f toSfVectorF(longVector2i target){
+sf::Vector2f toSfVectorF(longVector2i& target){
     return sf::Vector2f(target.x, target.y);
 }
-vector2i fromSfVectorI(sf::Vector2i target){
+vector2i fromSfVectorI(sf::Vector2i& target){
     return vector2i(target.x, target.y);
 }
-vector2i fromSfVectorI(sf::Vector2f target){
+vector2i fromSfVectorI(sf::Vector2f& target){
     return vector2i(target.x, target.y);
 }
 vector2i getMousePosition(){

@@ -47,7 +47,7 @@ private:
         }
         file.close();
     }
-    static void saveData(string path, vector<entry> targetVector){
+    static void saveData(string path, vector<entry>& targetVector){
         ofstream file(path);
         for(int i = 0; i < targetVector.size(); i++){
             for(int e = 0; e < to_string(targetVector[i].id).size(); e++){
@@ -68,7 +68,7 @@ public:
     static void getEntries(string path, vector<entry>& targetVector){
         loadData(path, targetVector);
     }
-    static void saveEntries(string path, vector<entry> targetVector){
+    static void saveEntries(string path, vector<entry>& targetVector){
         saveData(path, targetVector);
     }
 };
